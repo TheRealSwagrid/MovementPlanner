@@ -12,6 +12,7 @@ class MovementPlanner(AbstractVirtualCapability):
     def __init__(self, server):
         super().__init__(server)
         self.position = [0., 0., 0.]
+        self.uri = "MovementPlanner"
         #self.funtionality = {"set_pos_viz": None, "get_name": None, "set_name": None, "get_pos": None}
         self.current_block_id = None
 
