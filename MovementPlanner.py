@@ -20,10 +20,13 @@ class MovementPlanner(AbstractVirtualCapability):
         start = params["StartPoint"]
         end = params["EndPoint"]
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
-        point = self.invoke_sync("GetPosition", {})["Position3D"]
+        point = self.invoke_async("GetPosition", {}, callback=self.callback)
 
         print(f"GOING HAYWIRE {start} -> {end} with blocking: {blocks} and point {point}")
         return {"ListOfPoints": blocks}
+
+    def callback(self, params: dict):
+        print(f"GetPosition: {params}")
 
     def loop(self):
         sleep(.0001)
