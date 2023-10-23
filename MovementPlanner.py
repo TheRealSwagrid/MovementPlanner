@@ -23,7 +23,8 @@ class MovementPlanner(AbstractVirtualCapability):
         point = self.invoke_async("GetPosition", {}, callback=self.callback)
 
         print(f"GOING HAYWIRE {start} -> {end} with blocking: {blocks} and point {point}")
-        return {"ListOfPoints": blocks}
+
+        return {"ListOfPoints": [start, end]}
 
     def callback(self, params: dict):
         print(f"GetPosition: {params}")
