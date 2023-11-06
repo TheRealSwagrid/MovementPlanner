@@ -23,7 +23,6 @@ class MovementPlanner(AbstractVirtualCapability):
         want_dir = (np.array(start) - np.array(end)) / (np.linalg.norm(np.array(start) - np.array(end)))
         norm_dir = np.array(params["Vector3"]) / np.linalg.norm(np.array(params["Vector3"]))
 
-
         return {"ListOfPoints": [want_dir, norm_dir]}
 
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
