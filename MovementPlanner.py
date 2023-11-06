@@ -20,9 +20,10 @@ class MovementPlanner(AbstractVirtualCapability):
     def plan_movement(self, params: dict):
         start = params["StartPoint"]
         end = params["EndPoint"]
-        direction = params["Vector3"]
+        want_dir = np.linalg.norm(start - end)
+        norm_dir = np.linalg.norm(params["Vector3"])
 
-        return {"ListOfPoints": np.linalg.solve([np.array(start)[:2], np.array(direction)[:2]], np.array(end)[:2])}
+        return {"ListOfPoints": [want_dir, norm_dir]}
 
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
         point = self.invoke_async("GetPosition", {}, callback=self.callback)
