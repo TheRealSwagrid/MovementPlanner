@@ -2,6 +2,8 @@
 import signal
 import sys
 import time
+from copy import copy
+
 import numpy as np
 from time import sleep
 
@@ -20,18 +22,39 @@ class MovementPlanner(AbstractVirtualCapability):
     def plan_movement(self, params: dict):
         start = params["StartPoint"]
         end = params["EndPoint"]
-        want_dir = (np.array(start) - np.array(end)) / (np.linalg.norm(np.array(start) - np.array(end)))
-        norm_dir = np.array(params["Vector3"]) / np.linalg.norm(np.array(params["Vector3"]))
+        norm_want_dir = (np.linalg.norm(np.array(start) - np.array(end)))
+        if norm_want_dir == 0:
+            return {"ListOfPoints": []}
+        want_dir = np.abs((np.array(start) - np.array(end)) / norm_want_dir)
+        norm_current_dir = np.linalg.norm(np.array(params["Vector3"]))
+        if norm_current_dir == 0:
+            raise ValueError(f"No Direction set! Direction: " + params["Vector3"])
+        current_dir = np.abs(np.array(params["Vector3"]) / norm_current_dir)
 
-        return {"ListOfPoints": [want_dir, norm_dir]}
+        # Directions not aligned
+        if current_dir != want_dir:
+            raise ValueError(f"Direction doesn't work out! Wanted direction: {want_dir}, actual direction {current_dir}")
+
+        path_points = [start]
 
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
-        point = self.invoke_async("GetPosition", {}, callback=self.callback)
-        for tr in self.trajectories:
-            pass
-        print(f"GOING HAYWIRE {start} -> {end} with blocking: {blocks} and point {point}")
+        block_dims = self.invoke_sync("GetBlockDimensions", {})["ListOfPoints"]
+        formatPrint(self, f"BlockDims: {block_dims}")
 
-        return {"ListOfPoints": [start, end]}
+        final_direction = (np.array(start) - np.array(end)) / norm_want_dir
+        for b in blocks:
+            norm_block_dir = (np.linalg.norm(np.array(start) - np.array(b)))
+
+            if norm_block_dir != 0:
+                block_dir = (np.array(start) - np.array(b)) / norm_block_dir
+                # Block in the way
+                formatPrint(self, f"Block in the Way: {b}, from Start {start} to {end}")
+                if block_dir == final_direction:
+                    point = copy(b)
+                    point[2] += block_dims[2]
+                    path_points += [b]
+        path_points += [end]
+        return {"ListOfPoints": path_points}
 
     def callback(self, params: dict):
         print(f"GetPosition: {params}")
