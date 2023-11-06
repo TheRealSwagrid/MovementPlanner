@@ -15,13 +15,15 @@ class MovementPlanner(AbstractVirtualCapability):
         self.uri = "MovementPlanner"
         #self.funtionality = {"set_pos_viz": None, "get_name": None, "set_name": None, "get_pos": None}
         self.current_block_id = None
+        self.trajectories = []
 
     def plan_movement(self, params: dict):
         start = params["StartPoint"]
         end = params["EndPoint"]
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
         point = self.invoke_async("GetPosition", {}, callback=self.callback)
-
+        for tr in self.trajectories:
+            pass
         print(f"GOING HAYWIRE {start} -> {end} with blocking: {blocks} and point {point}")
 
         return {"ListOfPoints": [start, end]}
