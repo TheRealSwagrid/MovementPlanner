@@ -20,8 +20,9 @@ class MovementPlanner(AbstractVirtualCapability):
     def plan_movement(self, params: dict):
         start = params["StartPoint"]
         end = params["EndPoint"]
-        want_dir = np.linalg.norm(np.array(start) - np.array(end))
-        norm_dir = np.linalg.norm(np.array(params["Vector3"]))
+        want_dir = (np.array(start) - np.array(end)) / (np.linalg.norm(np.array(start) - np.array(end)))
+        norm_dir = np.array(params["Vector3"]) / np.linalg.norm(np.array(params["Vector3"]))
+
 
         return {"ListOfPoints": [want_dir, norm_dir]}
 
