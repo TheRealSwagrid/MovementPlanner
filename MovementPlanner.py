@@ -2,7 +2,7 @@
 import signal
 import sys
 import time
-from copy import copy
+import numpy as np
 from time import sleep
 
 from AbstractVirtualCapability import AbstractVirtualCapability, VirtualCapabilityServer, formatPrint
@@ -20,6 +20,9 @@ class MovementPlanner(AbstractVirtualCapability):
     def plan_movement(self, params: dict):
         start = params["StartPoint"]
         end = params["EndPoint"]
+        direction = params["Vector3"]
+
+        return {"ListOfPoints": np.linalg.solve([np.array(start), np.array(direction)], np.array(end))}
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
         point = self.invoke_async("GetPosition", {}, callback=self.callback)
         for tr in self.trajectories:
