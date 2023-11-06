@@ -22,7 +22,8 @@ class MovementPlanner(AbstractVirtualCapability):
         end = params["EndPoint"]
         direction = params["Vector3"]
 
-        return {"ListOfPoints": np.linalg.solve([np.array(start), np.array(direction)], np.array(end))}
+        return {"ListOfPoints": np.linalg.solve([np.array(start)[:2], np.array(direction)[:2]], np.array(end)[:2])}
+
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
         point = self.invoke_async("GetPosition", {}, callback=self.callback)
         for tr in self.trajectories:
