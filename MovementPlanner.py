@@ -24,7 +24,7 @@ class MovementPlanner(AbstractVirtualCapability):
         end = params["EndPoint"]
         norm_want_dir = (np.linalg.norm(np.array(start) - np.array(end)))
         if norm_want_dir == 0:
-            return {"ListOfPoints": []}
+            return {"ListOfPoints": [end]}
         want_dir = np.abs((np.array(start) - np.array(end)) / norm_want_dir)
         norm_current_dir = np.linalg.norm(np.array(params["Vector3"]))
         if norm_current_dir == 0:
@@ -32,7 +32,7 @@ class MovementPlanner(AbstractVirtualCapability):
         current_dir = np.abs(np.array(params["Vector3"]) / norm_current_dir)
 
         # Directions not aligned
-        if np.array_equal(current_dir, want_dir):
+        if not np.array_equal(current_dir, want_dir):
             raise ValueError(f"Direction doesn't work out! Wanted direction: {want_dir}, actual direction {current_dir}")
 
         path_points = [start]
@@ -49,7 +49,7 @@ class MovementPlanner(AbstractVirtualCapability):
                 block_dir = (np.array(start) - np.array(b)) / norm_block_dir
                 # Block in the way
                 formatPrint(self, f"Block in the Way: {b}, from Start {start} to {end}")
-                if np.array_equal(block_dir, final_direction):
+                if not np.array_equal(block_dir, final_direction):
                     point = copy(b)
                     point[2] += block_dims[2]
                     path_points += [b]
