@@ -25,11 +25,11 @@ class MovementPlanner(AbstractVirtualCapability):
         norm_want_dir = (np.linalg.norm(np.array(end) - np.array(start)))
         if norm_want_dir == 0:
             return {"ListOfPoints": [end]}
-        want_dir = np.abs((np.array(end) - np.array(start)) / norm_want_dir)
+        want_dir = [1. if x > 0.0 or x < 0.0 else 0. for x in np.abs((np.array(end) - np.array(start)) / norm_want_dir)]
         norm_current_dir = np.linalg.norm(np.array(params["Vector3"]))
         if norm_current_dir == 0:
             raise ValueError(f"No Direction set! Direction: " + params["Vector3"])
-        current_dir = np.abs(np.array(params["Vector3"]) / norm_current_dir)
+        current_dir = [1. if x > 0.0 or x < 0.0 else 0. for x in (np.abs(np.array(params["Vector3"]) / norm_current_dir))]
 
         # Directions not aligned
         if not np.array_equal(current_dir, want_dir):
@@ -41,17 +41,19 @@ class MovementPlanner(AbstractVirtualCapability):
         block_dims = self.invoke_sync("GetBlockDimensions", {})["ListOfPoints"]
         formatPrint(self, f"BlockDims: {block_dims}")
 
-        final_direction = (np.array(end) - np.array(start)) / norm_want_dir
+        final_direction = [1. if x > 0.0 else -1. if x < 0.0 else 0. for x in ((np.array(end) - np.array(start)) / norm_want_dir)]
         for b in blocks:
             norm_block_dir = (np.linalg.norm(np.array(b) - np.array(start)))
 
             if norm_block_dir != 0:
-                block_dir = (np.array(b) - np.array(start)) / norm_block_dir
+                block_dir = [1. if x > 0.0 else -1. if x < 0.0 else 0. for x in ((np.array(b) - np.array(start)) / norm_block_dir)]
                 # Block in the way
                 if np.array_equal(block_dir, final_direction):
                     formatPrint(self, f"Block in the Way: {b}, from Start {start} to {end}, Dir: {final_direction} vs {block_dir}")
+
                     point = copy(b)
                     point[2] += block_dims[2] + 1.
+
                     path_points += [b]
         path_points += [end]
         return {"ListOfPoints": path_points}
