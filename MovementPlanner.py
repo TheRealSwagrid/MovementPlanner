@@ -22,10 +22,10 @@ class MovementPlanner(AbstractVirtualCapability):
     def plan_movement(self, params: dict):
         start = params["StartPoint"]
         end = params["EndPoint"]
-        norm_want_dir = (np.linalg.norm(np.array(start) - np.array(end)))
+        norm_want_dir = (np.linalg.norm(np.array(end) - np.array(start)))
         if norm_want_dir == 0:
             return {"ListOfPoints": [end]}
-        want_dir = np.abs((np.array(start) - np.array(end)) / norm_want_dir)
+        want_dir = np.abs((np.array(end) - np.array(start)) / norm_want_dir)
         norm_current_dir = np.linalg.norm(np.array(params["Vector3"]))
         if norm_current_dir == 0:
             raise ValueError(f"No Direction set! Direction: " + params["Vector3"])
@@ -41,12 +41,12 @@ class MovementPlanner(AbstractVirtualCapability):
         block_dims = self.invoke_sync("GetBlockDimensions", {})["ListOfPoints"]
         formatPrint(self, f"BlockDims: {block_dims}")
 
-        final_direction = (np.array(start) - np.array(end)) / norm_want_dir
+        final_direction = (np.array(end) - np.array(start)) / norm_want_dir
         for b in blocks:
-            norm_block_dir = (np.linalg.norm(np.array(start) - np.array(b)))
+            norm_block_dir = (np.linalg.norm(np.array(b) - np.array(start)))
 
             if norm_block_dir != 0:
-                block_dir = (np.array(start) - np.array(b)) / norm_block_dir
+                block_dir = (np.array(b) - np.array(start)) / norm_block_dir
                 # Block in the way
                 if np.array_equal(block_dir, final_direction):
                     formatPrint(self, f"Block in the Way: {b}, from Start {start} to {end}, Dir: {final_direction} vs {block_dir}")
