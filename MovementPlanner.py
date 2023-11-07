@@ -47,7 +47,7 @@ class MovementPlanner(AbstractVirtualCapability):
             # Block in the way
             if np.array_equal(block_dir, final_direction):
                 formatPrint(self, f"Block in the Way: {b}, from Start {start} to {end}, Dir: {final_direction} vs {block_dir}")
-                distances = final_direction * ((np.array(end) - np.array(start)) < (np.array(b) - np.array(start)))
+                distances = final_direction * ((np.array(end) - np.array(start)) - (np.array(b) - np.array(start)))
                 formatPrint(self, f"Distances: {distances} - {start}<{b}<{end}")
                 point = copy(b)
                 point[2] += block_dims[2]
