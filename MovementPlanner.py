@@ -40,7 +40,7 @@ class MovementPlanner(AbstractVirtualCapability):
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
         block_dims = self.invoke_sync("GetBlockDimensions", {})["ListOfPoints"]
         formatPrint(self, f"BlockDims: {block_dims}")
-
+        current_height = start[2]
         final_direction = [1. if x > 0.0 else -1. if x < 0.0 else 0. for x in (np.array(end) - np.array(start))]
         for b in blocks:
             block_dir = [1. if x > 0.0 else -1. if x < 0.0 else 0. for x in (np.array(b) - np.array(start))]
@@ -48,10 +48,12 @@ class MovementPlanner(AbstractVirtualCapability):
             if np.array_equal(block_dir, final_direction):
                 formatPrint(self, f"Block in the Way: {b}, from Start {start} to {end}, Dir: {final_direction} vs {block_dir}")
                 distances = final_direction * ((np.array(end) - np.array(start)) - (np.array(b) - np.array(start)))
-                formatPrint(self, f"Distances: {distances} - {start}<{b}<{end}")
-                point = copy(b)
-                point[2] += block_dims[2]
-                path_points += [point]
+                # Block will be reached.
+                if (np.array(distances) < 0).any():
+                    formatPrint(self, f"Distances: {distances} - {start}<{b}<{end}")
+                    point = copy(b)
+                    point[2] += block_dims[2]
+                    path_points += [point]
         path_points += [end]
         return {"ListOfPoints": path_points}
 
