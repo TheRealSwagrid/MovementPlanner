@@ -32,7 +32,7 @@ class MovementPlanner(AbstractVirtualCapability):
         current_dir = [1. if x > 0.0 or x < 0.0 else 0. for x in (np.abs(np.array(params["Vector3"]) / norm_current_dir))]
 
         # Directions not aligned
-        if not np.array_equal(current_dir, want_dir):
+        if not np.array_equal(current_dir[:2], want_dir[:2]):
             raise ValueError(f"Direction doesn't work out! Wanted direction: {want_dir}, actual direction {current_dir}")
 
         path_points = [start]
