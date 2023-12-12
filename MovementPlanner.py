@@ -35,25 +35,29 @@ class MovementPlanner(AbstractVirtualCapability):
         if not np.array_equal(current_dir[:2], want_dir[:2]):
             raise ValueError(f"Direction doesn't work out! Wanted direction: {want_dir}, actual direction {current_dir}")
 
+        # Start determine the path
         path_points = [start]
 
         blocks = self.invoke_sync("get_all_blocks", {})["ListOfPoints"]
         block_dims = self.invoke_sync("GetBlockDimensions", {})["ListOfPoints"]
         formatPrint(self, f"BlockDims: {block_dims}")
+
         current_height = start[2]
+
         final_direction = [1. if x > 0.0 else -1. if x < 0.0 else 0. for x in (np.array(end) - np.array(start))]
         for b in blocks:
             block_dir = [1. if x > 0.0 else -1. if x < 0.0 else 0. for x in (np.array(b) - np.array(start))]
             # Block in the way
             if np.array_equal(block_dir, final_direction):
                 formatPrint(self, f"Block in the Way: {b}, from Start {start} to {end}, Dir: {final_direction} vs {block_dir}")
-                distances = final_direction * ((np.array(end) - np.array(start)) - (np.array(b) - np.array(start)))
+                distances = final_direction * ((np.array(start) - np.array(end)) - (np.array(start) - np.array(end)))
                 # Block will be reached.
                 if (np.array(distances) < 0).any():
                     formatPrint(self, f"Distances: {distances} - {start}<{b}<{end}")
                     point = copy(b)
                     point[2] += block_dims[2]
                     path_points += [point]
+
         path_points += [end]
         return {"ListOfPoints": path_points}
 
