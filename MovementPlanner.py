@@ -78,9 +78,12 @@ if __name__ == '__main__':
 
     try:
         port = None
+        ip = None
         if len(sys.argv[1:]) > 0:
             port = int(sys.argv[1])
-        server = VirtualCapabilityServer(port)
+        if len(sys.argv[2:]) > 0:
+            ip = str(sys.argv[2])
+        server = VirtualCapabilityServer(port, ip)
         listener = MovementPlanner(server)
         listener.start()
         signal.signal(signal.SIGTERM, handler)
